@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package model;
+
+message Keyword{
+  string Field = 1; // 出处（标题/正文...）
+  string Word = 2; // 关键词
+}
+
+message Document{
+  string Id = 1; // 业务 Id(唯一 Id)
+  uint64 DocId = 2; // 倒排索引的文档 Id
+  uint64 BitsFeature = 3; // 用于简单搜索过滤的 bit
+  repeated Keyword Keywords = 4; // 关键词
+  bytes Bytes = 5; // 用于存储序列化后的业务实体
+}
