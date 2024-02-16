@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-package model;
+package pb;
 
 message Keyword{
-  string Field = 1; // 出处（标题/正文...）
+  string Field = 1; // 来源（标题/正文...）
   string Word = 2; // 关键词
 }
 
@@ -14,3 +14,5 @@ message Document{
   repeated Keyword Keywords = 4; // 关键词
   bytes Bytes = 5; // 用于存储序列化后的业务实体
 }
+
+// protoc --gogofaster_out=./pb --proto_path=./pb document.proto

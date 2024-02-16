@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package pb;
+
+import "document.proto";
+
+message TermQuery{
+  repeated TermQuery Must = 1; // and 关系
+  repeated TermQuery Should = 2; // or 关系
+  Keyword Keyword = 3; // 若为叶节点，则带有关键词
+}
+
+// 将从-I 下引入 import，注意：windows 下，-I 需使用绝对路径
+// protoc -I='D:/hjr learing software/MyProject/search_engine/pb' --gogofaster_out=./pb --proto_path=./pb term_query.proto
