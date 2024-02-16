@@ -3,7 +3,7 @@ package test
 import (
 	"fmt"
 	"github.com/huandu/skiplist"
-	"search/app/internal/bll"
+	"search/internal/reverse_index"
 	"strings"
 	"testing"
 )
@@ -37,7 +37,7 @@ func init() {
 }
 
 func TestIntersectionOfSkipList(t *testing.T) {
-	intersection := bll.IntersectionOfSkipList()
+	intersection := reverse_index.IntersectionOfSkipList()
 	if intersection != nil {
 		node := intersection.Front()
 		for node != nil {
@@ -47,7 +47,7 @@ func TestIntersectionOfSkipList(t *testing.T) {
 	}
 	fmt.Println("\n" + strings.Repeat("-", 50))
 
-	intersection = bll.IntersectionOfSkipList(l1)
+	intersection = reverse_index.IntersectionOfSkipList(l1)
 	if intersection != nil {
 		node := intersection.Front()
 		for node != nil {
@@ -57,7 +57,7 @@ func TestIntersectionOfSkipList(t *testing.T) {
 	}
 	fmt.Println("\n" + strings.Repeat("-", 50))
 
-	intersection = bll.IntersectionOfSkipList(l1, l2)
+	intersection = reverse_index.IntersectionOfSkipList(l1, l2)
 	if intersection != nil {
 		node := intersection.Front()
 		for node != nil {
@@ -67,7 +67,7 @@ func TestIntersectionOfSkipList(t *testing.T) {
 	}
 	fmt.Println("\n" + strings.Repeat("-", 50))
 
-	intersection = bll.IntersectionOfSkipList(l1, l2, l3)
+	intersection = reverse_index.IntersectionOfSkipList(l1, l2, l3)
 	if intersection != nil {
 		node := intersection.Front()
 		for node != nil {
@@ -79,7 +79,7 @@ func TestIntersectionOfSkipList(t *testing.T) {
 }
 
 func TestUnionOfSetSkipList(t *testing.T) {
-	union := bll.UnionOfSkipList()
+	union := reverse_index.UnionOfSkipList()
 	if union != nil {
 		node := union.Front()
 		for node != nil {
@@ -89,7 +89,7 @@ func TestUnionOfSetSkipList(t *testing.T) {
 	}
 	fmt.Println("\n" + strings.Repeat("-", 50))
 
-	union = bll.UnionOfSkipList(l1)
+	union = reverse_index.UnionOfSkipList(l1)
 	if union != nil {
 		node := union.Front()
 		for node != nil {
@@ -99,7 +99,7 @@ func TestUnionOfSetSkipList(t *testing.T) {
 	}
 	fmt.Println("\n" + strings.Repeat("-", 50))
 
-	union = bll.UnionOfSkipList(l1, l2)
+	union = reverse_index.UnionOfSkipList(l1, l2)
 	if union != nil {
 		node := union.Front()
 		for node != nil {
@@ -109,7 +109,7 @@ func TestUnionOfSetSkipList(t *testing.T) {
 	}
 	fmt.Println("\n" + strings.Repeat("-", 50))
 
-	union = bll.UnionOfSkipList(l1, l2, l3)
+	union = reverse_index.UnionOfSkipList(l1, l2, l3)
 	if union != nil {
 		node := union.Front()
 		for node != nil {
