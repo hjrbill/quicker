@@ -27,9 +27,6 @@ Thumbs.db
 *.3
 *.2
 *.out
-*.o
-*.a
-*.prof
 
 # Go 运行时产生的文件
 *.exe~
