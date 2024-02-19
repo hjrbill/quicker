@@ -9,6 +9,13 @@ import (
 	"sync"
 )
 
+type ISkipListReverseIndex interface {
+	Add(doc *pb.Document)                                                     // 将文档加入进倒排索引
+	Remove(doc *pb.Document)                                                  // 删除索引中的某文档
+	IntersectionOfSkipList(skipList ...*skiplist.SkipList) *skiplist.SkipList // 获取索引间的交集交集
+	UnionOfSkipList(skipList ...*skiplist.SkipList) *skiplist.SkipList        // 获取索引间的并集
+}
+
 type SkipListReverseIndex struct {
 	table *util.ConcurrentMap // 并发 map
 	Locks []sync.RWMutex      // 对于同一 key，修改倒排索引时应该争抢锁
@@ -71,7 +78,7 @@ func (s *SkipListReverseIndex) Remove(doc *pb.Document) {
 	}
 }
 
-// IntersectionOfSkipList 判断跳表间是否存在并集
+// IntersectionOfSkipList 判断跳表间是否存在并集（取并是针对 key 而言，而非 value）
 func IntersectionOfSkipList(lists ...*skiplist.SkipList) *skiplist.SkipList {
 	// 先判断边界条件，看看是否需要进行比较
 	if len(lists) == 0 {

@@ -15,7 +15,7 @@ type MapIterator interface {
 	Next() *MapEntry
 }
 
-var _ MapIterator = (*ConcurrentMapIterator)(nil) // 对 ConcurrentMapIterator 是否实现了对 MapIterator 的继承进行检查
+var _ MapIterator = (*ConcurrentMapIterator)(nil) // 检查 ConcurrentMapIterator 是否实现了对 MapIterator 的继承
 
 type ConcurrentMap struct {
 	maps  []map[string]any
