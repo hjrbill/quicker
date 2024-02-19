@@ -1,4 +1,4 @@
-package reverse_index
+package reverseindex
 
 import (
 	"github.com/huandu/skiplist"

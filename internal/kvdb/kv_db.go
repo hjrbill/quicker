@@ -1,4 +1,4 @@
-package kv_db
+package kvdb
 
 import (
 	"errors"
@@ -6,6 +6,8 @@ import (
 	"os"
 	"strings"
 )
+
+var ErrDataNotFound = errors.New("data not found")
 
 type DBType int
 
@@ -16,17 +18,17 @@ const (
 )
 
 type IKeyValueDB interface {
+	GetDBPath() string                                // 获取数据存储的目录
 	Open() error                                      // 建立 DB 连接
 	Close() error                                     // 关闭连接
-	GetDBPath() string                                // 获取数据存储的目录
 	Set(key, value []byte) error                      // 写入 key-value
 	BatchSet(keys, values [][]byte) error             // 批量写入
 	Get(key []byte) ([]byte, error)                   // 根据 key 获取 value
 	BatchGet(keys [][]byte) ([][]byte, error)         // 批量获取 value
 	Delete(key []byte) error                          // 删除 key-value
 	BatchDelete(keys [][]byte) error                  // 批量删除
-	IterateKey(fn func(key []byte) error) int64       // 遍历并操作所有 key，返回受影响的条数
-	IterateDB(fn func(key, value []byte) error) int64 // 遍历并操作整个数据库，返回受影响的条数
+	IterateKey(fn func(key []byte) error) int64       // 遍历所有 key，返回获得的条数
+	IterateDB(fn func(key, value []byte) error) int64 // 遍历整个数据库，返回获得的条数
 	Has(key []byte) bool                              // 判断 key 是否存在
 }
 
@@ -56,11 +58,13 @@ func NewKVDB(dbType DBType, path string) (IKeyValueDB, error) {
 	var db IKeyValueDB
 	switch dbType {
 	case BADGER:
-	// TODO
+		db = new(BadgerDB).WithPath(path)
 	case REDIS:
-	// TODO
+		// TODO:暂时使用 bolt 代替，补全对 Redis 的支持
+		db = new(BoltDB).WithPath(path).WithBucket("default")
 	default:
-		// TODO:默认使用 bolt
+		// 默认使用 bolt
+		db = new(BoltDB).WithPath(path).WithBucket("default")
 	}
 	err = db.Open()
 	if err != nil {
