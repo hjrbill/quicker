@@ -121,7 +121,10 @@ func (b *BoltDB) BatchDelete(keys [][]byte) error {
 		}
 		return nil
 	})
-	return err
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (b *BoltDB) IterateKey(fn func(k []byte) error) int64 {

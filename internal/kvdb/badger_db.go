@@ -37,7 +37,7 @@ func (s *BadgerDB) Open() error {
 	}
 }
 
-// Close 把内存中的数据 flush 到磁盘，同时释放文件锁。如果没有 close，再 open 时会丢失很多数据
+// Close 把内存中的数据 flush 到磁盘，同时释放文件锁 (如果没有 close，再 open 时会丢失很多数据)
 func (s *BadgerDB) Close() error {
 	return s.db.Close()
 }

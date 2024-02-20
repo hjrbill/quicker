@@ -45,3 +45,6 @@ Thumbs.db
 
 # 生成的文件
 *.gen.go
+
+# 临时文件夹
+/temp

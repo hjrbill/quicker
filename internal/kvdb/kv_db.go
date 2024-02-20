@@ -50,7 +50,8 @@ func NewKVDB(dbType DBType, path string) (IKeyValueDB, error) {
 			return nil, errors.New("parent path was exist and it is not dir")
 		}
 		//// 检查父目录是否为普通文件
-		//if info.Mode().IsRegular() { //如果父路径是个普通文件，则把它删掉
+		//if info.Mode().IsRegular() {
+		//	// 如果父路径是个普通文件，则把它删掉
 		//	log.Printf("%s is a regular file, will delete it", parentPath)
 		//	os.Remove(parentPath)
 		//}
