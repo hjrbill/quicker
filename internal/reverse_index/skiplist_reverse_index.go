@@ -9,13 +9,6 @@ import (
 	"sync"
 )
 
-type ISkipListReverseIndex interface {
-	Add(doc *pb.Document)                                                     // 将文档加入进倒排索引
-	Remove(doc *pb.Document)                                                  // 删除索引中的某文档
-	IntersectionOfSkipList(skipList ...*skiplist.SkipList) *skiplist.SkipList // 获取索引间的交集交集
-	UnionOfSkipList(skipList ...*skiplist.SkipList) *skiplist.SkipList        // 获取索引间的并集
-}
-
 type SkipListReverseIndex struct {
 	table *util.ConcurrentMap // 并发 map
 	Locks []sync.RWMutex      // 对于同一 key，修改倒排索引时应该争抢锁
@@ -152,6 +145,77 @@ func UnionOfSkipList(lists ...*skiplist.SkipList) *skiplist.SkipList {
 			}
 			node = node.Next()
 		}
+	}
+	return res
+}
+
+func (s *SkipListReverseIndex) filterByBits(bit, onFlag, offFlag uint64, orFlags []uint64) bool {
+	if bit&onFlag != onFlag {
+		return false
+	}
+	if bit&offFlag != 0 {
+		return false
+	}
+	for _, orFlag := range orFlags {
+		if orFlag > 0 && bit&orFlag <= 0 {
+			return false
+		}
+	}
+	return true
+}
+
+// search Search 的具体实现
+// @result 返回的是一个*SkipList,key 是 docId,value 是 SkipListValue
+func (s *SkipListReverseIndex) search(term *pb.TermQuery, onFlag, offFlag uint64, orFlags []uint64) *skiplist.SkipList {
+	if term.Keyword != nil {
+		key := term.Keyword.ToString()
+		if value, ok := s.table.Get(key); !ok {
+			res := skiplist.New(skiplist.Uint64)
+			skl := value.(*skiplist.SkipList)
+			node := skl.Front()
+			if node != nil {
+				docId := node.Key()
+				sklValue := node.Value.(SkipListValue)
+				if s.filterByBits(sklValue.BitsFeature, onFlag, offFlag, orFlags) {
+					res.Set(docId, sklValue)
+				}
+				node.Next()
+			}
+			return res
+		}
+	} else if len(term.Must) >= 0 {
+		res := make([]*skiplist.SkipList, 0, len(term.Must))
+		for _, must := range term.Must {
+			res = append(res, s.search(must, onFlag, offFlag, orFlags))
+		}
+		return IntersectionOfSkipList(res...)
+	} else if len(term.Should) >= 0 {
+		res := make([]*skiplist.SkipList, 0, len(term.Should))
+		for _, should := range term.Should {
+			res = append(res, s.search(should, onFlag, offFlag, orFlags))
+		}
+		return UnionOfSkipList(res...)
+	}
+	return nil
+}
+
+// Search 搜索
+// @param term 使用 term 进行具体搜索
+// @param onFlag 使用 onFlag 对必需的条件进行快速过滤
+// @param offFlag 使用 offFlag 对必须不的条件进行快速过滤
+// @param orFlags 使用 orFlags 对可选的条件进行快速过滤
+// @result 如果结果为空，返回 nil，如果结果不为空，返回业务侧 Id 的数组
+func (s *SkipListReverseIndex) Search(term *pb.TermQuery, onFlag, offFlag uint64, orFlags []uint64) []string {
+	list := s.search(term, onFlag, offFlag, orFlags)
+	if list == nil {
+		return []string{}
+	}
+	res := make([]string, 0, list.Len())
+	node := list.Front()
+	if node != nil {
+		value := node.Value.(SkipListValue)
+		res = append(res, value.Id)
+		node.Next()
 	}
 	return res
 }
