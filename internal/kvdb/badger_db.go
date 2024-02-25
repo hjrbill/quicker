@@ -81,8 +81,6 @@ func (s *BadgerDB) BatchSet(keys, values [][]byte) error {
 	txn := s.db.NewTransaction(true)
 	for i, key := range keys {
 		value := values[i]
-		//duration := time.Hour * 87600
-		//util.util.Log.Debugf("duration",duration)
 		if err = txn.Set(key, value); err != nil {
 			_ = txn.Commit() //发生异常时就提交老事务，然后开一个新事务，重试 set
 			txn = s.db.NewTransaction(true)

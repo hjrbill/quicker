@@ -2,7 +2,7 @@ package test
 
 import (
 	"fmt"
-	"search/pb"
+	"quicker/pb"
 	"testing"
 )
 

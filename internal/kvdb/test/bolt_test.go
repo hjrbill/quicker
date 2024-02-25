@@ -1,8 +1,8 @@
 package test
 
 import (
-	"search/internal/kvdb"
-	"search/pkg/util"
+	"quicker/internal/kvdb"
+	"quicker/pkg/util"
 	"testing"
 )
 

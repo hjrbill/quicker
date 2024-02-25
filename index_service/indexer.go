@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/gob"
 	"log"
-	"search/internal/kvdb"
-	reverseindex "search/internal/reverse_index"
-	"search/pb"
+	"quicker/internal/kvdb"
+	reverseindex "quicker/internal/reverse_index"
+	"quicker/pb"
 	"strings"
 	"sync/atomic"
 )

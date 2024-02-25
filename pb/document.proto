@@ -12,7 +12,7 @@ message Document{
   uint64 DocId = 2; // 倒排索引的文档 Id
   uint64 BitsFeature = 3; // 用于简单搜索过滤的 bit
   repeated Keyword Keywords = 4; // 关键词
-  bytes Bytes = 5; // 用于存储序列化后的业务实体
+  bytes Bytes = 5; // 存储序列化后的业务实体
 }
 
 // protoc --gogofaster_out=./pb --proto_path=./pb document.proto

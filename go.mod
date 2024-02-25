@@ -1,4 +1,4 @@
-module search
+module quicker
 
 go 1.21.4
 

@@ -3,9 +3,9 @@ package reverseindex
 import (
 	"github.com/huandu/skiplist"
 	"github.com/leemcloughlin/gofarmhash"
+	"quicker/pb"
+	"quicker/pkg/util"
 	"runtime"
-	"search/pb"
-	"search/pkg/util"
 	"sync"
 )
 

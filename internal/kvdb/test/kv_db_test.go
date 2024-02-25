@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"search/internal/kvdb"
+	"quicker/internal/kvdb"
 	"testing"
 )
 

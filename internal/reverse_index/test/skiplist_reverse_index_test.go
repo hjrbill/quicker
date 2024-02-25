@@ -3,7 +3,7 @@ package test
 import (
 	"fmt"
 	"github.com/huandu/skiplist"
-	"search/internal/reverse_index"
+	reverseindex "quicker/internal/reverse_index"
 	"strings"
 	"testing"
 )
