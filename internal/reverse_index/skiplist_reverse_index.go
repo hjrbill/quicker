@@ -9,15 +9,17 @@ import (
 	"sync"
 )
 
-type SkipListReverseIndex struct {
-	table *util.ConcurrentMap // 并发 map
-	Locks []sync.RWMutex      // 对于同一 key，修改倒排索引时应该争抢锁
-}
+var _ = IReverseIndex(&SkipListReverseIndex{})
 
 // SkipListValue 跳表的 value，包含业务侧的 Id 和 BitsFeature
 type SkipListValue struct {
 	Id          string
 	BitsFeature uint64
+}
+
+type SkipListReverseIndex struct {
+	table *util.ConcurrentMap // 并发 map
+	Locks []sync.RWMutex      // 对于同一 key，修改倒排索引时应该争抢锁
 }
 
 // NewSkipListReverseIndex
@@ -57,15 +59,15 @@ func (s *SkipListReverseIndex) Add(doc *pb.Document) {
 }
 
 // Remove 删除跳表中的某文档
-func (s *SkipListReverseIndex) Remove(doc *pb.Document) {
-	for _, keyword := range doc.Keywords {
+func (s *SkipListReverseIndex) Remove(docId uint64, keywords []*pb.Keyword) {
+	for _, keyword := range keywords {
 		key := keyword.ToString()
 		lock := s.getLock(key)
 		lock.Lock()
 		// 尝试获取 key 对应的跳表
 		if value, ok := s.table.Get(key); ok {
 			skipList := value.(*skiplist.SkipList)
-			skipList.Remove(doc.DocId)
+			skipList.Remove(docId)
 		}
 		lock.Unlock()
 	}
