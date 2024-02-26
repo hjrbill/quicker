@@ -1,2 +1,2 @@
-# search_engine
+# Quicker
 A simple, demo-level vertical search engine

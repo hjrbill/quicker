@@ -2,9 +2,9 @@ package kvdb
 
 import (
 	"errors"
-	"log"
 	"os"
 	"path"
+	qlog "quicker/pkg/log"
 	"sync/atomic"
 
 	"github.com/dgraph-io/badger/v4"
@@ -56,10 +56,9 @@ func (s *BadgerDB) CheckAndGC() {
 	}
 	lsmSize2, vlogSize2 := s.db.Size()
 	if vlogSize2 < vlogSize1 {
-		// TODO：log 应该被替换
-		log.Printf("badger before GC, LSM %d, vlog %d. after GC, LSM %d, vlog %d", lsmSize1, vlogSize1, lsmSize2, vlogSize2)
+		qlog.Errorf("badger before GC, LSM %d, vlog %d. after GC, LSM %d, vlog %d", lsmSize1, vlogSize1, lsmSize2, vlogSize2)
 	} else {
-		log.Printf("collect zero garbage")
+		qlog.Info("collect zero garbage")
 	}
 }
 

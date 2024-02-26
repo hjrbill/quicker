@@ -2,9 +2,8 @@ package test
 
 import (
 	"errors"
-	"fmt"
-	"log"
 	"quicker/internal/kvdb"
+	qlog "quicker/pkg/log"
 	"testing"
 )
 
@@ -20,7 +19,7 @@ func init() {
 	windup = func() {
 		err := db.Close()
 		if err != nil {
-			log.Printf("db close failed, err: %v", err)
+			qlog.Errorf("db close failed, err: %v", err)
 		}
 	}
 }
@@ -44,12 +43,12 @@ func testSetAndGetAndDelete(db kvdb.IKeyValueDB) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("v1 =", string(v))
+	qlog.Debug("v1 =", string(v))
 	v, err = db.Get(k2)
 	if err != nil {
 		return err
 	}
-	fmt.Println("v2 =", string(v))
+	qlog.Debug("v2 =", string(v))
 	// 删除<k, v>
 	err = db.Delete(k1)
 	if err != nil {
@@ -69,8 +68,8 @@ func testSetAndGetAndDelete(db kvdb.IKeyValueDB) error {
 		return errors.New("key 应被删除，却能读出数据")
 	}
 	//判断 key 是否存在
-	fmt.Printf("k1 存在：%t\n", db.Has(k1))
-	fmt.Printf("k2 存在：%t\n", db.Has(k2))
+	qlog.Debugf("k1 存在：%t\n", db.Has(k1))
+	qlog.Debugf("k2 存在：%t\n", db.Has(k2))
 	return nil
 }
 
@@ -89,7 +88,7 @@ func testBatchSetAndBatchGetAndBatchDelete(db kvdb.IKeyValueDB) error {
 		return err
 	}
 	for i, v := range vs {
-		fmt.Printf("v%d = %s\n", i, string(v))
+		qlog.Debugf("v%d = %s\n", i, string(v))
 	}
 	// 批量删除
 	err = db.BatchDelete(keys)
@@ -110,9 +109,9 @@ func testBatchSetAndBatchGetAndBatchDelete(db kvdb.IKeyValueDB) error {
 		return errors.New("k3 应被删除，却能读出数据")
 	}
 	// 判断 key 是否存在
-	fmt.Printf("k1 存在 %t\n", db.Has(keys[0]))
-	fmt.Printf("k2 存在 %t\n", db.Has(keys[1]))
-	fmt.Printf("k3 存在 %t\n", db.Has(keys[2]))
+	qlog.Debugf("k1 存在 %t\n", db.Has(keys[0]))
+	qlog.Debugf("k2 存在 %t\n", db.Has(keys[1]))
+	qlog.Debugf("k3 存在 %t\n", db.Has(keys[2]))
 	return nil
 }
 
@@ -125,10 +124,10 @@ func testIterateDB(db kvdb.IKeyValueDB) error {
 	}
 
 	total := db.IterateDB(func(k, v []byte) error {
-		fmt.Printf("key = %s, value = %s\n", k, v)
+		qlog.Debugf("key = %s, value = %s\n", k, v)
 		return nil
 	})
-	fmt.Printf("total: %d\n", total)
+	qlog.Debugf("total: %d\n", total)
 	return nil
 }
 
@@ -141,10 +140,10 @@ func testIterateKey(db kvdb.IKeyValueDB) error {
 	}
 
 	total := db.IterateKey(func(k []byte) error {
-		fmt.Printf("key = %s\n", k)
+		qlog.Debugf("key = %s\n", k)
 		return nil
 	})
-	fmt.Printf("total: %d\n", total)
+	qlog.Debugf("total: %d\n", total)
 	return nil
 }
 
@@ -156,25 +155,25 @@ func testPipeline(t *testing.T) {
 	// 1. 测试单独写入，读取，删除
 	err := testSetAndGetAndDelete(db)
 	if err != nil {
-		log.Printf("test failed: %v", err)
+		qlog.Warnf("test failed: %v", err)
 		t.Fail()
 	}
 	// 2. 测试批量写入，读取，删除
 	err = testBatchSetAndBatchGetAndBatchDelete(db)
 	if err != nil {
-		log.Printf("test failed: %v", err)
+		qlog.Warnf("test failed: %v", err)
 		t.Fail()
 	}
 	// 3. 测试 IterateDB
 	err = testIterateDB(db)
 	if err != nil {
-		log.Printf("test failed: %v", err)
+		qlog.Warnf("test failed: %v", err)
 		t.Fail()
 	}
 	// 4. 测试 IterateKey
 	err = testIterateKey(db)
 	if err != nil {
-		log.Printf("test failed: %v", err)
+		qlog.Warnf("test failed: %v", err)
 		t.Fail()
 	}
 }

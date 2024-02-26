@@ -2,8 +2,8 @@ package kvdb
 
 import (
 	"errors"
-	"log"
 	"os"
+	qlog "quicker/pkg/log"
 	"strings"
 )
 
@@ -38,8 +38,7 @@ func NewKVDB(dbType DBType, path string) (IKeyValueDB, error) {
 
 	info, err := os.Stat(parentPath)
 	if os.IsNotExist(err) {
-		// TODO：log 应该被替换
-		log.Printf("create dir: %s", parentPath)
+		qlog.Infof("create dir: %s", parentPath)
 		err := os.MkdirAll(parentPath, os.ModePerm)
 		if err != nil {
 			return nil, errors.New("create dir error: " + err.Error())
@@ -52,7 +51,7 @@ func NewKVDB(dbType DBType, path string) (IKeyValueDB, error) {
 		//// 检查父目录是否为普通文件
 		//if info.Mode().IsRegular() {
 		//	// 如果父路径是个普通文件，则把它删掉
-		//	log.Printf("%s is a regular file, will delete it", parentPath)
+		//	qlog.Infof("%s is a regular file, will delete it", parentPath)
 		//	os.Remove(parentPath)
 		//}
 	}
@@ -61,7 +60,7 @@ func NewKVDB(dbType DBType, path string) (IKeyValueDB, error) {
 	case BADGER:
 		db = new(BadgerDB).WithPath(path)
 	case REDIS:
-		// TODO:暂时使用 bolt 代替，补全对 Redis 的支持
+		// TODO:暂时使用 bolt 代替，应补全对 Redis 的支持
 		db = new(BoltDB).WithPath(path).WithBucket("default")
 	default:
 		// 默认使用 bolt
