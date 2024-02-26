@@ -3,10 +3,10 @@ package index_service
 import (
 	"bytes"
 	"encoding/gob"
-	"log"
 	"quicker/internal/kvdb"
 	reverseindex "quicker/internal/reverse_index"
 	"quicker/pb"
+	qlog "quicker/pkg/log"
 	"strings"
 	"sync/atomic"
 )
@@ -46,8 +46,7 @@ func (indexer *Indexer) LoadFromForwardIndexFile() int64 {
 		var doc *pb.Document
 		err := decoder.Decode(doc) // 因为正排索引存储的是序列化后的 doc，所以先进行反序列化
 		if err != nil {
-			// TODO: 应替换 log
-			log.Printf("decode document failed, error: %v", err)
+			qlog.Warnf("decode document failed, error: %v", err)
 			return nil // 此处是特意返回 nil，避免遍历被中止
 		}
 		indexer.reverseIndex.Add(doc)
@@ -135,7 +134,7 @@ func (indexer *Indexer) Search(query *pb.TermQuery, onFlag, offFlag uint64, orFl
 	// 从正排索引中获取序列化后的文档
 	docBytes, err := indexer.forwardIndex.BatchGet(keys)
 	if err != nil {
-		log.Printf("read kvdb failed, error: %s", err)
+		qlog.Warnf("read kvdb failed, error: %s", err)
 		return nil, err
 	}
 

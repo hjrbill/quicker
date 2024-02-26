@@ -16,10 +16,19 @@ var (
 var (
 	Debug  = debugLogger.Println
 	Debugf = debugLogger.Printf
-	Info   = infoLogger.Println
-	Infof  = infoLogger.Printf
-	Warn   = warnLogger.Println
-	Warnf  = warnLogger.Printf
+
+	Info  = infoLogger.Println
+	Infof = infoLogger.Printf
+
+	Warn  = warnLogger.Println
+	Warnf = warnLogger.Printf
+
 	Error  = errorLogger.Println
 	Errorf = errorLogger.Printf
+
+	Fatal  = errorLogger.Fatal
+	Fatalf = errorLogger.Fatalf
+
+	Panic  = errorLogger.Panic
+	Panicf = errorLogger.Panicf
 )

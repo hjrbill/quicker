@@ -19,7 +19,7 @@ func init() {
 	windup = func() {
 		err := db.Close()
 		if err != nil {
-			qlog.Errorf("db close failed, err: %v", err)
+			qlog.Warnf("db close failed, err: %v", err)
 		}
 	}
 }

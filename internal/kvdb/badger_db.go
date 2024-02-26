@@ -56,7 +56,7 @@ func (s *BadgerDB) CheckAndGC() {
 	}
 	lsmSize2, vlogSize2 := s.db.Size()
 	if vlogSize2 < vlogSize1 {
-		qlog.Errorf("badger before GC, LSM %d, vlog %d. after GC, LSM %d, vlog %d", lsmSize1, vlogSize1, lsmSize2, vlogSize2)
+		qlog.Warnf("badger before GC, LSM %d, vlog %d. after GC, LSM %d, vlog %d", lsmSize1, vlogSize1, lsmSize2, vlogSize2)
 	} else {
 		qlog.Info("collect zero garbage")
 	}
