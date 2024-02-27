@@ -11,17 +11,18 @@ import (
 	"time"
 )
 
-const SERVICE_ROOT_PATH = "/quicker/index/"
+var _ IHub = (*ServiceHub)(nil)
 
 type ServiceHub struct {
 	client       *etcd.Client
-	heartbeat    int64 // 心跳频率（续约周期）
+	watched      sync.Map // 存储对服务的监听，key 为服务名，value 为 etcd.WatchChan
+	heartbeat    int64    // 心跳频率（续约周期）
 	loadBalancer LoadBalancer
 }
 
 var (
-	serviceHub *ServiceHub
-	once       sync.Once
+	serviceHub     *ServiceHub
+	serviceHubOnce sync.Once
 )
 
 // GetServiceHub
@@ -30,7 +31,7 @@ var (
 // @param loadBalancer 负载均衡策略
 func GetServiceHub(etcdServers []string, heartbeat int64, loadBalancer LoadBalancer) *ServiceHub {
 	if serviceHub == nil {
-		once.Do(func() {
+		serviceHubOnce.Do(func() {
 			client, err := etcd.New(etcd.Config{
 				Endpoints:   etcdServers,
 				DialTimeout: 3 * time.Second,
@@ -107,7 +108,8 @@ func (s *ServiceHub) UnRegister(serviceName string, endpoint string) error {
 	return nil
 }
 
-func (s *ServiceHub) getEndpoints(serviceName string) []string {
+// GetEndpoints 获取服务节点列表（自行实现节点选择）
+func (s *ServiceHub) GetEndpoints(serviceName string) []string {
 	prefix := strings.TrimRight(SERVICE_ROOT_PATH, "/") + "/" + serviceName
 	resp, err := s.client.Get(context.Background(), prefix, etcd.WithPrefix()) // 尝试以服务名为前缀获取节点
 	if err != nil {
@@ -122,10 +124,11 @@ func (s *ServiceHub) getEndpoints(serviceName string) []string {
 	return endpoints
 }
 
+// GetEndpoint 获取服务节点（可调用我方提供负载均衡或自行实现）
 func (s *ServiceHub) GetEndpoint(serviceName string) string {
 	if s.client == nil || s.loadBalancer == nil {
 		return ""
 	} else {
-		return s.loadBalancer.Take(s.getEndpoints(serviceName)) // 通过负载均衡算法从可用节点中获取一个
+		return s.loadBalancer.Take(s.GetEndpoints(serviceName)) // 通过负载均衡算法从可用节点中获取一个
 	}
 }
