@@ -12,7 +12,7 @@ var (
 
 // LoadBalancer 一个策略，定义了负载均衡的接口，用户可以自行实现，我方也提供了两种简单的负载均衡算法
 type LoadBalancer interface {
-	Take(endpoints []string) string // 从大量可用地址中通过负载均衡返回某地址
+	Take(endpoints []string) string // 如何从大量可用地址中通过负载均衡返回某地址
 }
 
 // Random 随机法

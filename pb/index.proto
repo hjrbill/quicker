@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package pb;
+
+import "document.proto";
+import "term_query.proto";
+
+message ID{
+  string ID = 1; // 业务方 ID
+}
+
+message AffectedCount{
+  int32 Count = 1;
+}
+
+message SearchRequest{
+  TermQuery TermQuery = 1;
+  uint64 OnFlag = 2;
+  uint64 OffFlag = 3;
+  repeated uint64 orFlag = 4;
+}
+
+message SearchResponse{
+  repeated Document Documents = 1;
+}
+
+message CountRequest{
+}
+
+service IndexService{
+  rpc AddDocument(Document) returns (AffectedCount);
+  rpc DeleteDocument(ID) returns (AffectedCount);
+  rpc Search(SearchRequest) returns (SearchResponse);
+  rpc Count(CountRequest) returns (AffectedCount);
+}
+
+// 将从-I 下引入 import，注意：windows 下，-I 需使用绝对路径
+// protoc -I='D:/hjr learing software/MyProject/search_engine/pb' --gogofaster_out=plugins=grpc:./pb --proto_path=./pb index.proto

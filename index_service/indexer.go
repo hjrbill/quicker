@@ -11,6 +11,8 @@ import (
 	"sync/atomic"
 )
 
+var _ IIndexer = (*Indexer)(nil)
+
 // Indexer 一个外观，封装正排索引与倒排索引两个模块（子系统）
 type Indexer struct {
 	forwardIndex kvdb.IKeyValueDB
@@ -18,15 +20,14 @@ type Indexer struct {
 	docIdCnt     uint64 // 用于记录当前 DocId 的最大值
 }
 
-func NewIndexer(cap int, dbType kvdb.DBType, dbPath string) (*Indexer, error) {
-	indexer := new(Indexer)
+func (indexer *Indexer) Init(cap int, dbType kvdb.DBType, dbPath string) error {
 	db, err := kvdb.NewKVDB(dbType, dbPath)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	indexer.forwardIndex = db
 	indexer.reverseIndex = reverseindex.NewSkipListReverseIndex(cap)
-	return indexer, nil
+	return nil
 }
 
 func (indexer *Indexer) Close() error {
@@ -55,8 +56,8 @@ func (indexer *Indexer) LoadFromForwardIndexFile() int64 {
 	return cnt
 }
 
-func (indexer *Indexer) Count() int64 {
-	n := int64(0)
+func (indexer *Indexer) Count() int32 {
+	n := int32(0)
 	indexer.forwardIndex.IterateKey(func(key []byte) error {
 		n++
 		return nil
