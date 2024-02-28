@@ -1,7 +1,7 @@
 package reverseindex
 
 import (
-	"quicker/pb"
+	"github.com/hjrbill/quicker/pb"
 )
 
 type IReverseIndex interface {

@@ -1,8 +1,8 @@
 package test
 
 import (
-	"quicker/internal/kvdb"
-	"quicker/pkg/util"
+	"github.com/hjrbill/quicker/internal/kvdb"
+	"github.com/hjrbill/quicker/pkg/util"
 	"testing"
 )
 

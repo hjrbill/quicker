@@ -1,4 +1,4 @@
-module quicker
+module github.com/hjrbill/quicker
 
 go 1.21.4
 

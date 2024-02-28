@@ -2,8 +2,8 @@ package test
 
 import (
 	"fmt"
+	reverseindex "github.com/hjrbill/quicker/internal/reverse_index"
 	"github.com/huandu/skiplist"
-	reverseindex "quicker/internal/reverse_index"
 	"strings"
 	"testing"
 )

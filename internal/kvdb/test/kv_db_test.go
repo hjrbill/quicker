@@ -2,8 +2,8 @@ package test
 
 import (
 	"errors"
-	"quicker/internal/kvdb"
-	qlog "quicker/pkg/log"
+	"github.com/hjrbill/quicker/internal/kvdb"
+	qlog "github.com/hjrbill/quicker/pkg/log"
 	"testing"
 )
 

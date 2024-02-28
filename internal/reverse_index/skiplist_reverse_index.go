@@ -1,10 +1,10 @@
 package reverseindex
 
 import (
+	"github.com/hjrbill/quicker/pb"
+	"github.com/hjrbill/quicker/pkg/util"
 	"github.com/huandu/skiplist"
 	"github.com/leemcloughlin/gofarmhash"
-	"quicker/pb"
-	"quicker/pkg/util"
 	"runtime"
 	"sync"
 )

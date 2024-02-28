@@ -2,9 +2,9 @@ package service_hub
 
 import (
 	"context"
+	qlog "github.com/hjrbill/quicker/pkg/log"
 	etcd "go.etcd.io/etcd/client/v3"
 	"golang.org/x/time/rate"
-	qlog "quicker/pkg/log"
 	"strings"
 	"sync"
 	"time"

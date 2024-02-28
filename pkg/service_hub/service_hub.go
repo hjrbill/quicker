@@ -3,9 +3,9 @@ package service_hub
 import (
 	"context"
 	"errors"
+	qlog "github.com/hjrbill/quicker/pkg/log"
 	"go.etcd.io/etcd/api/v3/v3rpc/rpctypes"
 	etcd "go.etcd.io/etcd/client/v3"
-	qlog "quicker/pkg/log"
 	"strings"
 	"sync"
 	"time"

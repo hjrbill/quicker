@@ -1,8 +1,8 @@
 package test
 
 import (
-	qlog "quicker/pkg/log"
-	"quicker/pkg/service_hub"
+	qlog "github.com/hjrbill/quicker/pkg/log"
+	"github.com/hjrbill/quicker/pkg/service_hub"
 	"testing"
 	"time"
 )

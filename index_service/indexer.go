@@ -3,10 +3,10 @@ package index_service
 import (
 	"bytes"
 	"encoding/gob"
-	"quicker/internal/kvdb"
-	reverseindex "quicker/internal/reverse_index"
-	"quicker/pb"
-	qlog "quicker/pkg/log"
+	"github.com/hjrbill/quicker/internal/kvdb"
+	reverseindex "github.com/hjrbill/quicker/internal/reverse_index"
+	"github.com/hjrbill/quicker/pb"
+	qlog "github.com/hjrbill/quicker/pkg/log"
 	"strings"
 	"sync/atomic"
 )
@@ -134,7 +134,7 @@ func (indexer *Indexer) Search(query *pb.TermQuery, onFlag, offFlag uint64, orFl
 	// 从正排索引中获取序列化后的文档
 	docBytes, err := indexer.forwardIndex.BatchGet(keys)
 	if err != nil {
-		qlog.Warnf("read kvdb failed, error: %s", err)
+		qlog.Warnf("read kv db failed, error: %s", err)
 		return nil, err
 	}
 

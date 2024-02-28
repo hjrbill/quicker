@@ -2,8 +2,8 @@ package kvdb
 
 import (
 	"errors"
+	qlog "github.com/hjrbill/quicker/pkg/log"
 	"os"
-	qlog "quicker/pkg/log"
 	"strings"
 )
 
