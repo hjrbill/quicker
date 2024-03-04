@@ -48,8 +48,6 @@ func (work *IndexServiceWork) Register(servicePort int, etcdServers []string, lo
 		if err != nil {
 			panic(err)
 		}
-		// TODO：测试完成后应去除
-		selfLocalIp = "127.0.0.1" // 在单机模拟分布式时，把 selfLocalIp 写死为 127.0.0.1
 		work.selfIP = selfLocalIp + ":" + strconv.Itoa(servicePort)
 
 		heartbeat := int64(3)
