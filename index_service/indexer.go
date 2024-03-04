@@ -50,7 +50,7 @@ func (indexer *Indexer) LoadFromForwardIndexFile() int64 {
 			qlog.Warnf("decode document failed, error: %v", err)
 			return nil // 此处是特意返回 nil，避免遍历被中止
 		}
-		indexer.reverseIndex.Add(doc)
+		indexer.reverseIndex.Add(*doc)
 		return nil
 	})
 	return cnt
@@ -66,7 +66,7 @@ func (indexer *Indexer) Count() int32 {
 }
 
 // AddDoc 在索引上添加文档，如果已存在，则会覆盖
-func (indexer *Indexer) AddDoc(doc *pb.Document) (int, error) {
+func (indexer *Indexer) AddDoc(doc pb.Document) (int, error) {
 	id := strings.TrimSpace(doc.Id)
 	if len(id) == 0 {
 		return 0, nil
@@ -83,7 +83,7 @@ func (indexer *Indexer) AddDoc(doc *pb.Document) (int, error) {
 	var value bytes.Buffer
 	decoder := gob.NewEncoder(&value)
 	if err := decoder.Encode(doc); err == nil {
-		err := indexer.forwardIndex.Set([]byte(id), doc.Bytes)
+		err := indexer.forwardIndex.Set([]byte(id), value.Bytes())
 		if err != nil {
 			return 0, err
 		}
@@ -117,7 +117,7 @@ func (indexer *Indexer) DeleteDoc(id string) (int, error) {
 	//从正排上删除
 	err = indexer.forwardIndex.Delete(forwardKey)
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 	return n, err
 }
@@ -128,7 +128,7 @@ func (indexer *Indexer) Search(query *pb.TermQuery, onFlag, offFlag uint64, orFl
 		return nil, nil
 	}
 
-	keys := make([][]byte, len(ids)) // 正排索引的 key
+	keys := make([][]byte, 0, len(ids)) // 正排索引的 key
 	for _, id := range ids {
 		keys = append(keys, []byte(id))
 	}
@@ -139,17 +139,18 @@ func (indexer *Indexer) Search(query *pb.TermQuery, onFlag, offFlag uint64, orFl
 		return nil, err
 	}
 
-	result := make([]*pb.Document, len(docBytes))
+	result := make([]*pb.Document, 0, len(docBytes))
 	reader := bytes.NewReader([]byte{})
 	for _, docByte := range docBytes {
-		reader.Reset(docByte)
-		decoder := gob.NewDecoder(reader)
-		var doc pb.Document
-		err := decoder.Decode(&doc)
-		if err == nil { // 如果解码成功，才将文档添加到返回值中
-			result = append(result, &doc)
+		if len(docByte) > 0 {
+			reader.Reset(docByte)
+			decoder := gob.NewDecoder(reader)
+			var doc pb.Document
+			err := decoder.Decode(&doc)
+			if err == nil { // 如果解码成功，才将文档添加到返回值中
+				result = append(result, &doc)
+			}
 		}
 	}
-
 	return result, nil
 }

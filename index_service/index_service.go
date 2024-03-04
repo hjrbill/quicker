@@ -88,7 +88,7 @@ func (work *IndexServiceWork) Close() error {
 }
 
 func (work *IndexServiceWork) AddDocument(ctx context.Context, document *pb.Document) (*pb.AffectedCount, error) {
-	cnt, err := work.Indexer.AddDoc(document)
+	cnt, err := work.Indexer.AddDoc(*document)
 	return &pb.AffectedCount{Count: int32(cnt)}, err
 }
 

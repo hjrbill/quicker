@@ -37,7 +37,7 @@ func (s *SkipListReverseIndex) getLock(key string) *sync.RWMutex {
 }
 
 // Add 将文档加入进跳表
-func (s *SkipListReverseIndex) Add(doc *pb.Document) {
+func (s *SkipListReverseIndex) Add(doc pb.Document) {
 	for _, keyword := range doc.Keywords {
 		key := keyword.ToString()
 		lock := s.getLock(key)
@@ -82,14 +82,15 @@ func IntersectionOfSkipList(lists ...*skiplist.SkipList) *skiplist.SkipList {
 		return lists[0]
 	}
 
-	curNodes := make([]*skiplist.Element, len(lists))
+	curNodes := make([]*skiplist.Element, len(lists)) // 给每条 SkipList 分配一个指针，从前往后遍历
+
 	for i, list := range lists {
-		// 当 list 为空时不可能存在交集，此外还需特别注意 list 可能为空的情况
-		if lists == nil || list.Len() == 0 {
+		if list == nil || list.Len() == 0 { // 当 list 为空时不可能存在交集
 			return nil
 		}
 		curNodes[i] = list.Front()
 	}
+
 	res := skiplist.New(skiplist.Uint64)
 	for {
 		maxi := uint64(0)
@@ -137,13 +138,16 @@ func UnionOfSkipList(lists ...*skiplist.SkipList) *skiplist.SkipList {
 	}
 
 	res := skiplist.New(skiplist.Uint64)
-	m := make(map[uint64]struct{}, len(lists))
+	keySet := make(map[any]struct{}, len(lists))
 	for _, list := range lists {
+		if list == nil {
+			continue
+		}
 		node := list.Front()
 		for node != nil {
-			if _, ok := m[node.Key().(uint64)]; !ok {
+			if _, ok := keySet[node.Key().(uint64)]; !ok {
 				res.Set(node.Key(), node.Value)
-				m[node.Key().(uint64)] = struct{}{}
+				keySet[node.Key()] = struct{}{}
 			}
 			node = node.Next()
 		}
@@ -171,27 +175,27 @@ func (s *SkipListReverseIndex) filterByBits(bit, onFlag, offFlag uint64, orFlags
 func (s *SkipListReverseIndex) search(term *pb.TermQuery, onFlag, offFlag uint64, orFlags []uint64) *skiplist.SkipList {
 	if term.Keyword != nil {
 		key := term.Keyword.ToString()
-		if value, ok := s.table.Get(key); !ok {
+		if value, ok := s.table.Get(key); ok {
 			res := skiplist.New(skiplist.Uint64)
 			skl := value.(*skiplist.SkipList)
 			node := skl.Front()
-			if node != nil {
-				docId := node.Key()
+			for node != nil {
+				docId := node.Key().(uint64)
 				sklValue := node.Value.(SkipListValue)
 				if s.filterByBits(sklValue.BitsFeature, onFlag, offFlag, orFlags) {
 					res.Set(docId, sklValue)
 				}
-				node.Next()
+				node = node.Next()
 			}
 			return res
 		}
-	} else if len(term.Must) >= 0 {
+	} else if len(term.Must) > 0 {
 		res := make([]*skiplist.SkipList, 0, len(term.Must))
 		for _, must := range term.Must {
 			res = append(res, s.search(must, onFlag, offFlag, orFlags))
 		}
 		return IntersectionOfSkipList(res...)
-	} else if len(term.Should) >= 0 {
+	} else if len(term.Should) > 0 {
 		res := make([]*skiplist.SkipList, 0, len(term.Should))
 		for _, should := range term.Should {
 			res = append(res, s.search(should, onFlag, offFlag, orFlags))
@@ -210,14 +214,14 @@ func (s *SkipListReverseIndex) search(term *pb.TermQuery, onFlag, offFlag uint64
 func (s *SkipListReverseIndex) Search(term *pb.TermQuery, onFlag, offFlag uint64, orFlags []uint64) []string {
 	list := s.search(term, onFlag, offFlag, orFlags)
 	if list == nil {
-		return []string{}
+		return nil
 	}
 	res := make([]string, 0, list.Len())
 	node := list.Front()
-	if node != nil {
+	for node != nil {
 		value := node.Value.(SkipListValue)
 		res = append(res, value.Id)
-		node.Next()
+		node = node.Next()
 	}
 	return res
 }
