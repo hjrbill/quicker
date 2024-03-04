@@ -45,7 +45,7 @@ func (indexer *Indexer) LoadFromForwardIndexFile() int64 {
 		reader.Reset(value)
 		decoder := gob.NewDecoder(reader)
 		var doc *pb.Document
-		err := decoder.Decode(doc) // 因为正排索引存储的是序列化后的 doc，所以先进行反序列化
+		err := decoder.Decode(&doc) // 因为正排索引存储的是序列化后的 doc，所以先进行反序列化
 		if err != nil {
 			qlog.Warnf("decode document failed, error: %v", err)
 			return nil // 此处是特意返回 nil，避免遍历被中止
