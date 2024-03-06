@@ -48,7 +48,7 @@ func StartService() {
 	}()
 }
 
-func TestIndexService(t *testing.T) {
+func TestSentinelService(t *testing.T) {
 	StartService()              //server 和 client 分到不同的协程里去。实际中，server 和 client 是部署在不同的机器上
 	time.Sleep(1 * time.Second) //等 server 启动完毕
 
