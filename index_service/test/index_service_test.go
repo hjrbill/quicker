@@ -30,7 +30,7 @@ func StartService() {
 	}
 
 	server := grpc.NewServer()
-	service := new(index_service.IndexServiceWork)
+	service := new(index_service.IndexServiceWorker)
 	err = service.Init(50000, kvdb.BADGER, util.RootPath+"temp/book_badger")
 	if err != nil {
 		panic(err)

@@ -13,13 +13,13 @@ import (
 )
 
 const (
-	INDEX_SERVICE = "index_service"
+	INDEX_SERVICE = "index_service" // 索引服务 worker 的服务名
 )
 
-var _ pb.IndexServiceServer = (*IndexServiceWork)(nil)
+var _ pb.IndexServiceServer = (*IndexServiceWorker)(nil)
 
-// IndexServiceWork 一个 grpc server，是本框架分布式部署的基本单位
-type IndexServiceWork struct {
+// IndexServiceWorker 一个 grpc server，是本框架分布式部署的基本单位
+type IndexServiceWorker struct {
 	Indexer *Indexer
 	// 服务注册有关的配置
 	selfIP string
@@ -27,7 +27,7 @@ type IndexServiceWork struct {
 }
 
 // Init 初始化正排索引和倒排索引
-func (work *IndexServiceWork) Init(cap int, dbType kvdb.DBType, dbPath string) error {
+func (work *IndexServiceWorker) Init(cap int, dbType kvdb.DBType, dbPath string) error {
 	work.Indexer = new(Indexer)
 	return work.Indexer.Init(cap, dbType, dbPath)
 }
@@ -36,7 +36,7 @@ func (work *IndexServiceWork) Init(cap int, dbType kvdb.DBType, dbPath string) e
 // @param servicePort 服务运行端口
 // @param etcdServers etcd 集群地址，如果想使用单例模式，可以传 nil
 // @param loadBalancer 负载均衡策略
-func (work *IndexServiceWork) Register(servicePort int, etcdServers []string, loadBalancer service_hub.LoadBalancer) error {
+func (work *IndexServiceWorker) Register(servicePort int, etcdServers []string, loadBalancer service_hub.LoadBalancer) error {
 	if len(etcdServers) > 0 {
 		if servicePort < 1024 {
 			return fmt.Errorf("监听端口号 %d 为公认端口，不应使用，请使用大于 1024 的端口", servicePort)
@@ -48,6 +48,7 @@ func (work *IndexServiceWork) Register(servicePort int, etcdServers []string, lo
 		if err != nil {
 			panic(err)
 		}
+		selfLocalIp = "127.0.0.1" // TODO 单机模拟分布式时，把 selfLocalIp 写死为 127.0.0.1
 		work.selfIP = selfLocalIp + ":" + strconv.Itoa(servicePort)
 
 		heartbeat := int64(3)
@@ -69,7 +70,7 @@ func (work *IndexServiceWork) Register(servicePort int, etcdServers []string, lo
 	return nil
 }
 
-func (work *IndexServiceWork) Close() error {
+func (work *IndexServiceWorker) Close() error {
 	if work.Indexer != nil {
 		err := work.Indexer.Close()
 		if err != nil {
@@ -85,21 +86,21 @@ func (work *IndexServiceWork) Close() error {
 	return nil
 }
 
-func (work *IndexServiceWork) AddDocument(ctx context.Context, document *pb.Document) (*pb.AffectedCount, error) {
+func (work *IndexServiceWorker) AddDocument(ctx context.Context, document *pb.Document) (*pb.AffectedCount, error) {
 	cnt, err := work.Indexer.AddDoc(*document)
 	return &pb.AffectedCount{Count: int32(cnt)}, err
 }
 
-func (work *IndexServiceWork) DeleteDocument(ctx context.Context, id *pb.ID) (*pb.AffectedCount, error) {
+func (work *IndexServiceWorker) DeleteDocument(ctx context.Context, id *pb.ID) (*pb.AffectedCount, error) {
 	cnt, err := work.Indexer.DeleteDoc(id.ID)
 	return &pb.AffectedCount{Count: int32(cnt)}, err
 }
 
-func (work *IndexServiceWork) Search(ctx context.Context, req *pb.SearchRequest) (*pb.SearchResponse, error) {
+func (work *IndexServiceWorker) Search(ctx context.Context, req *pb.SearchRequest) (*pb.SearchResponse, error) {
 	docs, err := work.Indexer.Search(req.TermQuery, req.OnFlag, req.OffFlag, req.OrFlag)
 	return &pb.SearchResponse{Documents: docs}, err
 }
 
-func (work *IndexServiceWork) Count(ctx context.Context, req *pb.CountRequest) (*pb.AffectedCount, error) {
+func (work *IndexServiceWorker) Count(ctx context.Context, req *pb.CountRequest) (*pb.AffectedCount, error) {
 	return &pb.AffectedCount{Count: work.Indexer.Count()}, nil
 }

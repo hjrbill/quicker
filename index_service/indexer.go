@@ -122,8 +122,8 @@ func (indexer *Indexer) DeleteDoc(id string) (int, error) {
 	return n, err
 }
 
-func (indexer *Indexer) Search(query *pb.TermQuery, onFlag, offFlag uint64, orFlag []uint64) ([]*pb.Document, error) {
-	ids := indexer.reverseIndex.Search(query, onFlag, offFlag, orFlag)
+func (indexer *Indexer) Search(query *pb.TermQuery, onFlag, offFlag uint64, orFlags []uint64) ([]*pb.Document, error) {
+	ids := indexer.reverseIndex.Search(query, onFlag, offFlag, orFlags)
 	if len(ids) == 0 {
 		return nil, nil
 	}
