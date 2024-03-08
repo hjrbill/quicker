@@ -2,6 +2,7 @@ package index_service
 
 import "github.com/hjrbill/quicker/pb"
 
+// IIndexer Sentinel（分布式 grpc 的哨兵）和 Indexer（单机索引）都实现了该接口
 type IIndexer interface {
 	AddDoc(doc pb.Document) (int, error)
 	DeleteDoc(id string) (int, error)

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package model;
+
+message Video {
+  string ID = 1;
+  string title = 2;
+  string Author = 3;
+  int64 PostTime = 4;
+  int32 View = 5;
+  int32 Like = 6;
+  int32 Coin = 7;
+  int32 Favorite = 8;
+  int32 Share = 9;
+  repeated string KeyWords = 10;
+}
+
+// protoc --gogofaster_out=./demo/dal --proto_path=./demo/dal video.proto
