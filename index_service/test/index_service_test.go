@@ -3,11 +3,11 @@ package test
 import (
 	"context"
 	"fmt"
+	pb "github.com/hjrbill/quicker/gen"
 	"github.com/hjrbill/quicker/index_service"
 	"github.com/hjrbill/quicker/internal/kvdb"
-	"github.com/hjrbill/quicker/pb"
 	qlog "github.com/hjrbill/quicker/pkg/log"
-	"github.com/hjrbill/quicker/pkg/util"
+	"github.com/hjrbill/quicker/pkg/path"
 	"net"
 	"strconv"
 	"testing"
@@ -31,7 +31,7 @@ func StartService() {
 
 	server := grpc.NewServer()
 	service := new(index_service.IndexServiceWorker)
-	err = service.Init(50000, kvdb.BADGER, util.RootPath+"temp/book_badger")
+	err = service.Init(50000, kvdb.BADGER, path.RootPath+"temp/book_badger")
 	if err != nil {
 		panic(err)
 	} //不进行服务注册，client 直连 server

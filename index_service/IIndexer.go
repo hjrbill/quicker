@@ -1,6 +1,6 @@
 package index_service
 
-import "github.com/hjrbill/quicker/pb"
+import pb "github.com/hjrbill/quicker/gen"
 
 // IIndexer Sentinel（分布式 grpc 的哨兵）和 Indexer（单机索引）都实现了该接口
 type IIndexer interface {

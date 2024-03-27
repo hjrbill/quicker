@@ -2,12 +2,12 @@ package test
 
 import (
 	"fmt"
+	pb "github.com/hjrbill/quicker/gen"
 	"github.com/hjrbill/quicker/index_service"
 	"github.com/hjrbill/quicker/internal/kvdb"
-	"github.com/hjrbill/quicker/pb"
 	qlog "github.com/hjrbill/quicker/pkg/log"
+	"github.com/hjrbill/quicker/pkg/path"
 	"github.com/hjrbill/quicker/pkg/service_hub"
-	"github.com/hjrbill/quicker/pkg/util"
 	"google.golang.org/grpc"
 	"net"
 	"strconv"
@@ -34,7 +34,7 @@ func StartWorkers() {
 
 		server := grpc.NewServer()
 		service := new(index_service.IndexServiceWorker)
-		err = service.Init(50000, kvdb.BADGER, util.RootPath+"temp/book_badger_"+strconv.Itoa(i))
+		err = service.Init(50000, kvdb.BADGER, path.RootPath+"temp/book_badger_"+strconv.Itoa(i))
 		if err != nil {
 			panic(err)
 		}

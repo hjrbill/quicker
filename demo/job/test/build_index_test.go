@@ -4,14 +4,14 @@ import (
 	"github.com/hjrbill/quicker/demo/job"
 	"github.com/hjrbill/quicker/index_service"
 	"github.com/hjrbill/quicker/internal/kvdb"
-	"github.com/hjrbill/quicker/pkg/util"
+	"github.com/hjrbill/quicker/pkg/path"
 	"os"
 	"testing"
 )
 
 var (
 	dbType  = kvdb.BOLT
-	dbPath  = util.RootPath + "temp/test/bolt_db"
+	dbPath  = path.RootPath + "temp/test/bolt_db"
 	indexer *index_service.Indexer
 )
 
@@ -26,6 +26,6 @@ func Init() {
 func TestBuildIndexFromFile(t *testing.T) {
 	Init()
 	defer indexer.Close()
-	csvFile := util.RootPath + "demo/deployments/video.csv"
+	csvFile := path.RootPath + "demo/deployments/video.csv"
 	job.BuildIndexFromFile(csvFile, indexer, 0, 0)
 }

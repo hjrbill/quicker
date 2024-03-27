@@ -1,4 +1,4 @@
-package util
+package mapx
 
 import (
 	"github.com/leemcloughlin/gofarmhash"

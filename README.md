@@ -9,7 +9,7 @@
 <img src="demo/views/img/倒排索引.png" width="500"/>    
 
 - 倒排索引的 list 是有序的，便于多条倒排链快速求交集。
-- IntId 是 quicker 系统内部给 doc 生成的自增 id，用于 SkipList 的排序。
+- DocId 是 quicker 系统内部给 doc 生成的自增 id，用于 SkipList 的排序。
 - Id 是 doc 在业务侧的 ID。
 - BitsFeature 是 uint64，可以把 doc 的属性编码成 bit 流，遍历倒排索引的同时完成部分筛选功能。
 

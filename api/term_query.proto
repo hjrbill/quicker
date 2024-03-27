@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package pb;
 
+option go_package="./gen;pb";
+
 import "document.proto";
 
 message TermQuery{
@@ -11,4 +13,4 @@ message TermQuery{
 }
 
 // 将从-I 下引入 import，注意：windows 下，-I 需使用绝对路径
-// protoc -I='D:/hjr learing software/MyProject/search_engine/pb' --gogofaster_out=./pb --proto_path=./pb term_query.proto
+// protoc -I='D:/hjr learing software/MyProject/search_engine/api' --gogofaster_out=./ --proto_path=./ api/term_query.proto

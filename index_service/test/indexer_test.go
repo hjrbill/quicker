@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
+	pb "github.com/hjrbill/quicker/gen"
 	"github.com/hjrbill/quicker/index_service"
 	"github.com/hjrbill/quicker/internal/kvdb"
-	"github.com/hjrbill/quicker/pb"
 	qlog "github.com/hjrbill/quicker/pkg/log"
-	"github.com/hjrbill/quicker/pkg/util"
+	"github.com/hjrbill/quicker/pkg/path"
 	"strings"
 	"testing"
 )
@@ -50,7 +50,7 @@ func DeserializeBook(v []byte) *Book {
 
 var (
 	dbType = kvdb.BADGER
-	dbPath = util.RootPath + "temp/test/badger_db"
+	dbPath = path.RootPath + "temp/test/badger_db"
 )
 
 func TestSearch(t *testing.T) {

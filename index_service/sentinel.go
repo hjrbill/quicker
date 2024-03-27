@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/hjrbill/quicker/pb"
+	pb "github.com/hjrbill/quicker/gen"
 	qlog "github.com/hjrbill/quicker/pkg/log"
 	"github.com/hjrbill/quicker/pkg/service_hub"
 	"google.golang.org/grpc"

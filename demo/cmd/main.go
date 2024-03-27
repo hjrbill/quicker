@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/hjrbill/quicker/demo/route"
 	"github.com/hjrbill/quicker/internal/kvdb"
-	"github.com/hjrbill/quicker/pkg/util"
+	"github.com/hjrbill/quicker/pkg/path"
 	"strconv"
 )
 
@@ -20,7 +20,7 @@ var (
 
 var (
 	dbType      = kvdb.BOLT                                     //正排索引使用哪种 KV 数据库
-	csvFile     = util.RootPath + "/demo/deployments/video.csv" //原始的数据文件，由它来创建索引
+	csvFile     = path.RootPath + "/demo/deployments/video.csv" //原始的数据文件，由它来创建索引
 	etcdServers = []string{"127.0.0.1:2379"}                    //etcd 集群的地址
 )
 

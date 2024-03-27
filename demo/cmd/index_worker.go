@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/hjrbill/quicker/demo/job"
+	pb "github.com/hjrbill/quicker/gen"
 	"github.com/hjrbill/quicker/index_service"
-	"github.com/hjrbill/quicker/pb"
 	"github.com/hjrbill/quicker/pkg/service_hub"
 	"google.golang.org/grpc"
 	"log"

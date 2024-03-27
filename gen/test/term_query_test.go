@@ -2,7 +2,7 @@ package test
 
 import (
 	"fmt"
-	"github.com/hjrbill/quicker/pb"
+	pb "github.com/hjrbill/quicker/gen"
 	"testing"
 )
 

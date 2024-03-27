@@ -1,8 +1,8 @@
 package reverseindex
 
 import (
-	"github.com/hjrbill/quicker/pb"
-	"github.com/hjrbill/quicker/pkg/util"
+	pb "github.com/hjrbill/quicker/gen"
+	"github.com/hjrbill/quicker/pkg/map"
 	"github.com/huandu/skiplist"
 	"github.com/leemcloughlin/gofarmhash"
 	"runtime"
@@ -18,7 +18,7 @@ type SkipListValue struct {
 }
 
 type SkipListReverseIndex struct {
-	table *util.ConcurrentMap // 并发 map
+	table *mapx.ConcurrentMap // 并发 map
 	Locks []sync.RWMutex      // 对于同一 key，修改倒排索引时应该争抢锁
 }
 
@@ -26,7 +26,7 @@ type SkipListReverseIndex struct {
 // @param cap: 预计需要插入的总文档数量（即便实际超过也只是额外会产生扩容的开销）
 func NewSkipListReverseIndex(cap int) *SkipListReverseIndex {
 	return &SkipListReverseIndex{
-		table: util.NewConcurrentMap(runtime.NumCPU(), cap), //
+		table: mapx.NewConcurrentMap(runtime.NumCPU(), cap), //
 		Locks: make([]sync.RWMutex, 1331),
 	}
 }

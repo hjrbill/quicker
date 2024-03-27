@@ -1,8 +1,6 @@
 package reverseindex
 
-import (
-	"github.com/hjrbill/quicker/pb"
-)
+import pb "github.com/hjrbill/quicker/gen"
 
 type IReverseIndex interface {
 	Add(doc pb.Document)                                                          // 将文档加入进倒排索引

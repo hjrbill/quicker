@@ -3,9 +3,9 @@ package index_service
 import (
 	"bytes"
 	"encoding/gob"
+	pb "github.com/hjrbill/quicker/gen"
 	"github.com/hjrbill/quicker/internal/kvdb"
 	reverseindex "github.com/hjrbill/quicker/internal/reverse_index"
-	"github.com/hjrbill/quicker/pb"
 	qlog "github.com/hjrbill/quicker/pkg/log"
 	"strings"
 	"sync/atomic"

@@ -6,7 +6,7 @@ import (
 	model "github.com/hjrbill/quicker/demo/gen/video"
 	"github.com/hjrbill/quicker/demo/job"
 	"github.com/hjrbill/quicker/demo/job/search/common"
-	"github.com/hjrbill/quicker/pb"
+	pb "github.com/hjrbill/quicker/gen"
 	"strings"
 )
 

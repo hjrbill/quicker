@@ -3,11 +3,11 @@ package index_service
 import (
 	"context"
 	"fmt"
+	pb "github.com/hjrbill/quicker/gen"
 	"github.com/hjrbill/quicker/internal/kvdb"
-	"github.com/hjrbill/quicker/pb"
 	qlog "github.com/hjrbill/quicker/pkg/log"
+	"github.com/hjrbill/quicker/pkg/net"
 	"github.com/hjrbill/quicker/pkg/service_hub"
-	"github.com/hjrbill/quicker/pkg/util"
 	"strconv"
 	"time"
 )
@@ -44,7 +44,7 @@ func (work *IndexServiceWorker) Register(servicePort int, etcdServers []string, 
 			return fmt.Errorf("监听端口号 %d 为动态端口，不建议使用，建议使用小于 49152 的端口", servicePort)
 		}
 
-		selfLocalIp, err := util.GetLocalIPWithHardware() // 获取本机 IP
+		selfLocalIp, err := net.GetLocalIPWithHardware() // 获取本机 IP
 		if err != nil {
 			panic(err)
 		}
