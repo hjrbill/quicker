@@ -26,6 +26,6 @@ func Init() {
 func TestBuildIndexFromFile(t *testing.T) {
 	Init()
 	defer indexer.Close()
-	csvFile := util.RootPath + "demo/data/video.csv"
+	csvFile := util.RootPath + "demo/deployments/video.csv"
 	job.BuildIndexFromFile(csvFile, indexer, 0, 0)
 }

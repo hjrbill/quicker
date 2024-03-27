@@ -92,7 +92,7 @@ func TestIndexCluster(t *testing.T) {
 		Bytes:       book.Serialize(),
 	}
 
-	n, err := sentinel.AddDocument(doc)
+	n, err := sentinel.AddDoc(doc)
 	if err != nil {
 		qlog.Debugf("添加文档失败: %v", err)
 		t.Fail()
@@ -102,7 +102,11 @@ func TestIndexCluster(t *testing.T) {
 	//测试 Search 接口
 	query := pb.NewTermQuery("content", "文物")
 	query = query.And(pb.NewTermQuery("content", "唐朝"))
-	docs := sentinel.Search(query, 0, 0, nil)
+	docs, err := sentinel.Search(query, 0, 0, nil)
+	if err != nil {
+		qlog.Debugf("检索文档失败: %v", err)
+		t.Fail()
+	}
 
 	docId := ""
 	if len(docs) == 0 {
@@ -119,12 +123,20 @@ func TestIndexCluster(t *testing.T) {
 
 	//测试 Delete 接口
 	if len(docId) > 0 {
-		n := sentinel.DeleteDocument(docId)
+		n, err := sentinel.DeleteDoc(docId)
+		if err != nil {
+			qlog.Debugf("删除文档失败: %v", err)
+			t.Fail()
+		}
 		qlog.Debugf("删除%d个 doc\n", n)
 	}
 
 	//测试 Search 接口
-	docs = sentinel.Search(query, 0, 0, nil)
+	docs, err = sentinel.Search(query, 0, 0, nil)
+	if err != nil {
+		qlog.Debugf("检索文档失败: %v", err)
+		t.Fail()
+	}
 	if len(docs) == 0 {
 		qlog.Debug("无搜索结果")
 	} else {

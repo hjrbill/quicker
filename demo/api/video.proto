@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package model;
 
+option go_package="./demo/gen/video;model";
+
 message Video {
   string ID = 1;
   string title = 2;
@@ -15,4 +17,4 @@ message Video {
   repeated string KeyWords = 10;
 }
 
-// protoc --gogofaster_out=./demo/dal --proto_path=./demo/dal video.proto
+// protoc --gogofaster_out=./ --proto_path=./ ./demo/api/video.proto

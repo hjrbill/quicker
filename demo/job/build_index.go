@@ -3,7 +3,7 @@ package job
 import (
 	"encoding/csv"
 	"github.com/gogo/protobuf/proto"
-	model "github.com/hjrbill/quicker/demo/dal"
+	model "github.com/hjrbill/quicker/demo/gen/video"
 	"github.com/hjrbill/quicker/index_service"
 	"github.com/hjrbill/quicker/pb"
 	farmhash "github.com/leemcloughlin/gofarmhash"

@@ -15,6 +15,8 @@ import (
 	"time"
 )
 
+var _ IIndexer = (*Sentinel)(nil)
+
 // Sentinel 分布式 Work 的控制
 type Sentinel struct {
 	hub      service_hub.IHub // 服务注册中心
@@ -22,6 +24,9 @@ type Sentinel struct {
 }
 
 // NewSentinel 默认使用 HubProxy，可使用 WithHub 设置自定义 Hub
+// @etcdServers etcd 配置
+// @loadBalancer 负载均衡算法
+// @qps 限流 QPS
 func NewSentinel(etcdServers []string, loadBalancer service_hub.LoadBalancer, qps int) *Sentinel {
 	return &Sentinel{
 		hub:      service_hub.GetServiceHubProxy(etcdServers, 10, loadBalancer, qps),
@@ -79,8 +84,8 @@ func (s *Sentinel) GetGrpcConn(endpoint string) *grpc.ClientConn {
 	return conn
 }
 
-// AddDocument 通过负载均衡算法获取可用的 IndexServiceWorker 并向其添加文档
-func (s *Sentinel) AddDocument(doc pb.Document) (int32, error) {
+// AddDoc 通过负载均衡算法获取可用的 IndexServiceWorker 并向其添加文档
+func (s *Sentinel) AddDoc(doc pb.Document) (int, error) {
 	endpoint := s.hub.GetEndpoint(INDEX_SERVICE)
 	if endpoint == "" {
 		return 0, errors.New("没有可用的 IndexServiceWorker")
@@ -94,16 +99,16 @@ func (s *Sentinel) AddDocument(doc pb.Document) (int32, error) {
 		return 0, err
 	}
 	qlog.Infof("向 IndexServiceWorker %s 添加文档共 %d 条", endpoint, affected.Count)
-	return affected.Count, nil
+	return int(affected.Count), nil
 }
 
-// DeleteDocument 向所有 IndexServiceWorker 广播，要求删除文档
-func (s *Sentinel) DeleteDocument(id string) int32 {
+// DeleteDoc 向所有 IndexServiceWorker 广播，要求删除文档
+func (s *Sentinel) DeleteDoc(id string) (int, error) {
 	var affectedCount int32
 
 	endpoints := s.hub.GetEndpoints(INDEX_SERVICE)
 	if len(endpoints) == 0 {
-		return 0
+		return 0, errors.New("没有可用的 IndexServiceWorker")
 	}
 	wg := sync.WaitGroup{}
 	wg.Add(len(endpoints))
@@ -125,14 +130,14 @@ func (s *Sentinel) DeleteDocument(id string) int32 {
 		}(endpoint)
 	}
 	wg.Wait()
-	return atomic.LoadInt32(&affectedCount)
+	return int(atomic.LoadInt32(&affectedCount)), nil
 }
 
 // Search 向所有 IndexServiceWorker 广播，进行检索，并合并结果
-func (s *Sentinel) Search(query *pb.TermQuery, onFlag, offFlag uint64, orFlags []uint64) []*pb.Document {
+func (s *Sentinel) Search(query *pb.TermQuery, onFlag, offFlag uint64, orFlags []uint64) ([]*pb.Document, error) {
 	endpoints := s.hub.GetEndpoints(INDEX_SERVICE)
 	if len(endpoints) == 0 {
-		return nil
+		return nil, errors.New("没有可用的 IndexServiceWorker")
 	}
 
 	docs := make([]*pb.Document, 0, len(endpoints)*10)
@@ -178,7 +183,7 @@ func (s *Sentinel) Search(query *pb.TermQuery, onFlag, offFlag uint64, orFlags [
 	wg.Wait()
 	close(result)
 	<-resultFinish
-	return docs
+	return docs, nil
 }
 
 // Count 向所有 IndexServiceWorker 广播，要求获取文档总数
