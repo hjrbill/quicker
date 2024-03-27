@@ -5,6 +5,7 @@ import (
 	"github.com/hjrbill/quicker/demo/job/search/common"
 	"github.com/hjrbill/quicker/demo/job/search/filter"
 	"github.com/hjrbill/quicker/demo/job/search/recaller"
+	"golang.org/x/exp/maps"
 	"time"
 
 	"log"
@@ -38,27 +39,43 @@ func (searcher *VideoSearcher) Recall(ctx *common.VideoSearchContext) {
 	if len(searcher.Recallers) == 0 {
 		return
 	}
+	//并行执行多路召回
+	collection := make(chan *model.Video, 1000)
 	wg := sync.WaitGroup{}
 	wg.Add(len(searcher.Recallers))
-	collection := make(chan *model.Video, 1000)
-	// 并发的执行多种召回
-	for _, searchRecaller := range searcher.Recallers {
-		go func(searchRecaller Recaller) {
+	for _, recaller := range searcher.Recallers {
+		go func(recaller Recaller) {
 			defer wg.Done()
-			rule := reflect.TypeOf(searchRecaller).Name()
-			videos, err := searchRecaller.Recall(ctx)
+			rule := reflect.TypeOf(recaller).Name()
+			result, err := recaller.Recall(ctx)
 			if err != nil {
-				log.Printf("召回规则 %s 失败: %s", rule, err)
+				log.Printf("recall %s failed: %v", rule, err)
 				return
 			}
-			log.Printf("以 %s 规则召回了 %d 条视频\n", rule, len(videos))
-			for _, video := range videos {
+			log.Printf("recall %d talents by %s", len(result), rule)
+			for _, video := range result {
 				collection <- video
 			}
-		}(searchRecaller)
+		}(recaller)
 	}
+	//通过 map 合并多路召回的结果
+	videoMap := make(map[string]*model.Video, 1000)
+	receiveFinish := make(chan struct{})
+	go func() {
+		for {
+			video, ok := <-collection
+			if !ok {
+				break
+			}
+			videoMap[video.ID] = video
+		}
+		receiveFinish <- struct{}{}
+	}()
 	wg.Wait()
 	close(collection)
+	<-receiveFinish
+
+	ctx.Result = maps.Values(videoMap)
 }
 
 func (searcher *VideoSearcher) Filter(ctx *common.VideoSearchContext) {
@@ -87,8 +104,8 @@ type AllVideoSearcher struct {
 
 func NewAllVideoSearcher() *AllVideoSearcher {
 	searcher := new(AllVideoSearcher)
-	searcher.WithRecaller(&recaller.KeywordRecaller{})
-	searcher.WithFilter(&filter.ViewerFilter{})
+	searcher.WithRecaller(recaller.KeywordRecaller{})
+	searcher.WithFilter(filter.ViewerFilter{})
 	return searcher
 }
 
@@ -99,7 +116,7 @@ type AuthorVideoSearcher struct {
 
 func NewAuthorVideoSearcher() *AuthorVideoSearcher {
 	searcher := new(AuthorVideoSearcher)
-	searcher.WithRecaller(&recaller.KeywordAuthorRecaller{})
-	searcher.WithFilter(&filter.ViewerFilter{})
+	searcher.WithRecaller(recaller.KeywordAuthorRecaller{})
+	searcher.WithFilter(filter.ViewerFilter{})
 	return searcher
 }

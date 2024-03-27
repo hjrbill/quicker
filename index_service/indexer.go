@@ -41,19 +41,20 @@ func (indexer *Indexer) Close() error {
 // LoadFromForwardIndexFile 从正排索引的数据库文件中加载数据（用于程序重启后）
 func (indexer *Indexer) LoadFromForwardIndexFile() int64 {
 	reader := bytes.NewReader([]byte{})
-	cnt := indexer.forwardIndex.IterateDB(func(key, value []byte) error {
-		reader.Reset(value)
+	n := indexer.forwardIndex.IterateDB(func(k, v []byte) error {
+		reader.Reset(v)
 		decoder := gob.NewDecoder(reader)
-		var doc *pb.Document
-		err := decoder.Decode(&doc) // 因为正排索引存储的是序列化后的 doc，所以先进行反序列化
+		var doc pb.Document
+		err := decoder.Decode(&doc)
 		if err != nil {
-			qlog.Warnf("decode document failed, error: %v", err)
-			return nil // 此处是特意返回 nil，避免遍历被中止
+			qlog.Warnf("gob decode document failed：%s", err)
+			return nil
 		}
-		indexer.reverseIndex.Add(*doc)
-		return nil
+		indexer.reverseIndex.Add(doc)
+		return err
 	})
-	return cnt
+	qlog.Infof("load %d data from forward index %s", n, indexer.forwardIndex.GetDBPath())
+	return n
 }
 
 func (indexer *Indexer) Count() int32 {

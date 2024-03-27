@@ -13,10 +13,10 @@ import (
 type KeywordRecaller struct {
 }
 
-func (*KeywordRecaller) Recall(ctx *common.VideoSearchContext) ([]*model.Video, error) {
+func (KeywordRecaller) Recall(ctx *common.VideoSearchContext) ([]*model.Video, error) {
 	request := ctx.Request
 	if request == nil {
-		return nil, nil
+		return nil, errors.New("request is nil")
 	}
 	indexer := ctx.Indexer
 	if indexer == nil {

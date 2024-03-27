@@ -13,7 +13,7 @@ import (
 type KeywordAuthorRecaller struct {
 }
 
-func (*KeywordAuthorRecaller) Recall(ctx *common.VideoSearchContext) ([]*model.Video, error) {
+func (KeywordAuthorRecaller) Recall(ctx *common.VideoSearchContext) ([]*model.Video, error) {
 	request := ctx.Request
 	if request == nil {
 		return nil, errors.New("request is nil")

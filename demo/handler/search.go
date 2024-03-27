@@ -62,7 +62,7 @@ func Search(ctx *gin.Context) {
 	for _, doc := range docs {
 		var video model.Video
 		if err := proto.Unmarshal(doc.Bytes, &video); err == nil {
-			if video.View >= int32(request.ViewFrom) && (request.ViewTo <= 0 || video.View <= int32(request.ViewTo)) { //满足播放量的区间范围
+			if video.View >= int32(request.ViewFrom) && (request.ViewTo <= 0 || video.View <= int32(request.ViewTo)) { //满足播放量的范围
 				videos = append(videos, video)
 			}
 		}

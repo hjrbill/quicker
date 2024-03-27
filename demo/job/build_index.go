@@ -112,12 +112,14 @@ func AddVideoToIndex(video *model.Video, indexer index_service.IIndexer) error {
 	doc.BitsFeature = GetClassBits(video.KeyWords) // 构建快速过滤使用的 类别 bit
 
 	keywords := make([]*pb.Keyword, 0, len(video.KeyWords)+1)
-	keywords = append(doc.Keywords, &pb.Keyword{
-		Field: "author",                      // 来源：作者
-		Word:  strings.ToLower(video.Author), // 关键词
-	})
+	if len(video.Author) > 0 {
+		keywords = append(keywords, &pb.Keyword{
+			Field: "author",                      // 来源：作者
+			Word:  strings.ToLower(video.Author), // 关键词
+		})
+	}
 	for _, kw := range video.KeyWords {
-		keywords = append(doc.Keywords, &pb.Keyword{
+		keywords = append(keywords, &pb.Keyword{
 			Field: "content",           // 来源：视频内容
 			Word:  strings.ToLower(kw), // 关键词
 		})
