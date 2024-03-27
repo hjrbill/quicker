@@ -1,6 +1,7 @@
 package recaller
 
 import (
+	"errors"
 	"github.com/gogo/protobuf/proto"
 	model "github.com/hjrbill/quicker/demo/gen/video"
 	"github.com/hjrbill/quicker/demo/job"
@@ -15,24 +16,24 @@ type KeywordAuthorRecaller struct {
 func (*KeywordAuthorRecaller) Recall(ctx *common.VideoSearchContext) ([]*model.Video, error) {
 	request := ctx.Request
 	if request == nil {
-		return nil, nil
+		return nil, errors.New("request is nil")
 	}
 	indexer := ctx.Indexer
 	if indexer == nil {
-		return nil, nil
+		return nil, errors.New("indexer is nil")
 	}
 
 	query := new(pb.TermQuery)
 	if len(request.Keywords) > 0 {
 		for _, keyword := range request.Keywords {
-			query.And(pb.NewTermQuery("content", keyword)) // 按关键字过滤
+			query = query.And(pb.NewTermQuery("content", keyword)) // 按关键字过滤
 		}
 	}
 	v := ctx.Ctx.Value(common.UN("user_name"))
 	if v != nil {
 		if author, ok := v.(string); ok {
 			if len(author) > 0 {
-				query.And(pb.NewTermQuery("author", strings.ToLower(author)))
+				query = query.And(pb.NewTermQuery("author", strings.ToLower(author)))
 			}
 		}
 	}

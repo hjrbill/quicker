@@ -23,19 +23,15 @@ type Filter interface {
 // VideoSearcher 一个模板方法的超类，规范了 Search 的过程，其子类应该重写 recaller 和 filter
 type VideoSearcher struct {
 	Recallers []Recaller //实际中，除了正常的关键词召回外，可能还要召回广告
-	Filters   []filter.Filter
+	Filters   []Filter
 }
 
-func (searcher *VideoSearcher) WithRecallers(recallers ...Recaller) *VideoSearcher {
-	return &VideoSearcher{
-		Recallers: recallers,
-	}
+func (searcher *VideoSearcher) WithRecaller(recaller ...Recaller) {
+	searcher.Recallers = append(searcher.Recallers, recaller...)
 }
 
-func (searcher *VideoSearcher) WithFilters(filters ...filter.Filter) *VideoSearcher {
-	return &VideoSearcher{
-		Filters: filters,
-	}
+func (searcher *VideoSearcher) WithFilter(filter ...Filter) {
+	searcher.Filters = append(searcher.Filters, filter...)
 }
 
 func (searcher *VideoSearcher) Recall(ctx *common.VideoSearchContext) {
@@ -52,6 +48,7 @@ func (searcher *VideoSearcher) Recall(ctx *common.VideoSearchContext) {
 			rule := reflect.TypeOf(searchRecaller).Name()
 			videos, err := searchRecaller.Recall(ctx)
 			if err != nil {
+				log.Printf("召回规则 %s 失败: %s", rule, err)
 				return
 			}
 			log.Printf("以 %s 规则召回了 %d 条视频\n", rule, len(videos))
@@ -90,8 +87,8 @@ type AllVideoSearcher struct {
 
 func NewAllVideoSearcher() *AllVideoSearcher {
 	searcher := new(AllVideoSearcher)
-	searcher.WithRecallers(&recaller.KeywordRecaller{})
-	searcher.WithFilters(&filter.ViewerFilter{})
+	searcher.WithRecaller(&recaller.KeywordRecaller{})
+	searcher.WithFilter(&filter.ViewerFilter{})
 	return searcher
 }
 
@@ -102,7 +99,7 @@ type AuthorVideoSearcher struct {
 
 func NewAuthorVideoSearcher() *AuthorVideoSearcher {
 	searcher := new(AuthorVideoSearcher)
-	searcher.WithRecallers(&recaller.KeywordAuthorRecaller{})
-	searcher.WithFilters(&filter.ViewerFilter{})
+	searcher.WithRecaller(&recaller.KeywordAuthorRecaller{})
+	searcher.WithFilter(&filter.ViewerFilter{})
 	return searcher
 }

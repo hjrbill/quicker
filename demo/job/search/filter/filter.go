@@ -25,7 +25,6 @@ func (*ViewerFilter) Apply(ctx *common.VideoSearchContext) {
 		if int32(request.ViewFrom) <= video.View && video.View <= int32(request.ViewTo) {
 			videos = append(videos, video)
 		}
-
 	}
 	ctx.Result = videos
 	return
